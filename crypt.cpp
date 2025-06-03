@@ -1,12 +1,27 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <vector>
+#include <sstream>
 using namespace std;
 
 class Crypt {
 private:
 	map<char, int> letterToIndex;
 	map<int, char> indexToLetter;
+	const char delimiter = '_';
+
+	vector<string> formatRawLine(string line) {
+		vector<string> indexes;
+		stringstream stream(line);
+		string splitString;
+
+		while (getline(stream, splitString, delimiter)) {
+			indexes.push_back(splitString);
+		}
+
+		return indexes;
+	}
 
 public:
 	Crypt() {
@@ -33,28 +48,29 @@ public:
 			else {
 				letterIndex += 4;
 			}
-			encryptedIndexes += to_string(letterIndex) + "_";
+			encryptedIndexes += to_string(letterIndex) + delimiter;
 		}
 
 		return encryptedIndexes;
 	}
 
-	string decryptString(string indexes) {
+	string decryptString(string indexesRaw) {
 		string decryptedString;
+		vector<string> indexes = formatRawLine(indexesRaw);
 
-		for (char c : indexes) {
-			int ic = (int)c;
-			if (ic - 4 < 0) {
-				ic -= 4;
-				int difference = 25 + ic;
-				ic = difference;
+		for (int i = 0; i < indexes.size(); i++) {
+			int currentIndex = stoi(indexes[i]);
+			if (currentIndex - 4 < 0) {
+				currentIndex -= 4;
+				int difference = 25 + currentIndex;
+				currentIndex = difference;
 			}
 			else {
-				ic -= 4;
+				currentIndex -= 4;
 			}
-
-			decryptedString += indexToLetter.at(ic);
+			decryptedString += indexToLetter.at(currentIndex);
 		}
+
 		return decryptedString;
 	}
 };
